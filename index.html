@@ -1,6 +1,12 @@
 <!DOCTYPE html>
-<html>
-<head>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <script
+      crossorigin="anonymous"
+      src="https://cdn.botframework.com/botframework-webchat/latest/webchat.js"
+    ></script>
     <link
       rel="stylesheet"
       href="https://cdn.botframework.com/botframework-webchat/latest/botchat.css"
@@ -38,10 +44,6 @@
         transition: height 0.3s ease;
       }
 
-      #botWrapper.expanded {
-        height: 300px;
-      }
-
       #header {
         background-color: #008943;
         color: white;
@@ -61,6 +63,7 @@
       #header .title {
         margin: 0;
         padding: 0 0 0 1rem;
+        font-size: 14px;
       }
 
       #header .icon {
@@ -68,96 +71,130 @@
         cursor: pointer;
       }
 
-      .header-icon {
-        display: flex;
-        align-items: center;
-      }
-
-      #bot-frame {
+      #webchat {
         width: 100%;
         height: 86.5%;
         border: none;
       }
 
-      /* Custom Webchat Styles */
-      .webchat__send-box {
-        border: none;
-      }
-
-      .webchat__send-box__input {
-        box-shadow: none !important;
-        border: none !important;
-      }
-
-      .webchat__bubble--from-user {
+      .ac-pushButton {
         background-color: #008943 !important;
-        color: white;
+        color: #ffffff !important;
+        border: none !important;
+        font-size: 12.25px !important;
+      }
+      .ac-pushButton:active {
+        background-color: #008943 !important;
+        color: #ffffff !important;
       }
 
-      .webchat__bubble--from-bot {
-        background-color: #f1f1f1;
-        color: black;
+      .ac-textBlock {
+        font-size: 14px !important;
       }
 
-      /* Change all blue to green */
-      .webchat__icon-button {
-        color: #008943 !important;
+      .webchat__bubble__content {
+        font-size: 14px !important;
       }
 
-      .webchat__icon-button:hover {
-        color: #006f37 !important;
+      /* .webchat__bubble--user .webchat__bubble__content {
+        font-size: 13.5px !important;
       }
 
-      /* Add margin inside the chat box */
-      .webchat__basic-transcript {
-        margin: 10px;
+      .webchat__bubble--bot .webchat__bubble__content {
+        font-size: 13.5px !important;
+      } */
+
+      .webchat__bubble__content {
+        border: 0.2px solid gainsboro !important;
       }
     </style>
-</head>
-
-<body>
-    <!-- BOT-WRAPPER -->
+  </head>
+  <body>
     <div id="botWrapper">
-        <div id="header" onclick="toggleBot()">
-            <div class="header-wrapper-left">
-                <span>
-                    <img
-                      class="header-icon"
-                      src="assets/bot-icon.png"
-                      alt="Conversational Bot Icon"
-                      style="height: 2rem; width: 2rem"
-                    />
-                </span>
-                <span class="title">Chat</span>
-            </div>
-            <div class="header-wrapper-right">
-                <i
-                  class="bi bi-arrow-clockwise icon"
-                  onclick="restartConversation(event)"
-                ></i>
-            </div>
+      <div id="header" onclick="toggleBot()">
+        <div class="header-wrapper-left">
+          <span>
+            <img
+              class="header-icon"
+              src="assets/bot-icon.png"
+              alt="Conversational Bot Icon"
+              style="height: 2rem; width: 2rem; display: flex;"
+            />
+          </span>
+          <span class="title">Chat</span>
         </div>
-        <iframe id="bot-frame" src="https://webchat.botframework.com/embed/GIT-CAREER-BOT-WEBAPP?s=eQVwakE9ga4.eMNoSiiaW9d6OStiyppoPhJmqHhVQ__mRU94WNb3hwA"></iframe>
+        <div class="header-wrapper-right">
+          <i
+            class="bi bi-arrow-clockwise"
+            onclick="restartConversation(event)"
+          ></i>
+        </div>
+      </div>
+      <div id="webchat" role="main"></div>
     </div>
 
     <script>
       function toggleBot() {
-          const botWrapper = document.getElementById("botWrapper");
-          botWrapper.style.height =
-              botWrapper.style.height === "550px" ? "58px" : "550px";
+        const botWrapper = document.getElementById("botWrapper");
+        botWrapper.style.height =
+          botWrapper.style.height === "550px" ? "58px" : "550px";
       }
 
       function generateUniqueUserId() {
-          return 'user_' + Date.now();
+        return "user_" + Date.now();
+      }
+
+      const styleOptions = {
+        bubbleFromUserBackground: "#008943",
+        bubbleFromUserTextColor: "#ffffff",
+      };
+
+      let directLine;
+      let userId;
+
+      function initWebChat() {
+        userId = generateUniqueUserId();
+        directLine = window.WebChat.createDirectLine({
+          token: "NleRZJo_qV8.04q96ws1u6CpMC4Zkdd0uQ4bfQ4YB7InF8TJ-4HMG1Q",
+          userID: userId,
+        });
+        window.WebChat.renderWebChat(
+          {
+            directLine: directLine,
+            userID: userId,
+            locale: "en-US",
+            styleOptions: styleOptions,
+          },
+          document.getElementById("webchat")
+        );
       }
 
       function restartConversation(event) {
-          event.stopPropagation();
-          const botFrame = document.getElementById("bot-frame");
-          const uniqueUserId = generateUniqueUserId();
-          const botUrl = `https://webchat.botframework.com/embed/GIT-CAREER-BOT-WEBAPP?s=eQVwakE9ga4.eMNoSiiaW9d6OStiyppoPhJmqHhVQ__mRU94WNb3hwA&userId=${uniqueUserId}`;
-          botFrame.src = botUrl;
+        event.stopPropagation();
+        const newUserId = generateUniqueUserId();
+        const webchatContainer = document.getElementById("webchat");
+        const newWebChatContainer = document.createElement("div");
+        newWebChatContainer.id = "webchat";
+        webchatContainer.parentNode.replaceChild(
+          newWebChatContainer,
+          webchatContainer
+        );
+        directLine = window.WebChat.createDirectLine({
+          token: "NleRZJo_qV8.04q96ws1u6CpMC4Zkdd0uQ4bfQ4YB7InF8TJ-4HMG1Q",
+          userID: newUserId,
+        });
+        window.WebChat.renderWebChat(
+          {
+            directLine: directLine,
+            userID: newUserId,
+            locale: "en-US",
+            styleOptions: styleOptions,
+          },
+          newWebChatContainer
+        );
       }
+
+      window.onload = initWebChat;
     </script>
-</body>
+  </body>
 </html>
